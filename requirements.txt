@@ -3,9 +3,11 @@ Django==4.1.1
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.0
 django-cors-headers==3.13.0
+django-pb-model==0.3.3
 gunicorn==20.1.0
 Pillow==9.2.0
 PyJWT==2.4.0
+protobuf==4.21.7
 pytz==2022.2.1
 requests==2.28.1
 sqlparse==0.4.3

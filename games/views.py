@@ -11,8 +11,3 @@ import os
 
 # Create your views here.
 
-
-class GamesView(APIView):
-
-
-    os.getenv("GIANTBOMB_API_KEY")

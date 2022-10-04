@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'users',
     'modules',
     'activities',
+    'pb_model',
 ]
 
 MIDDLEWARE = [
@@ -151,3 +152,7 @@ REST_FRAMEWORK = {
     ],
     'PAGE_SIZE': 20
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
