@@ -1,5 +1,8 @@
+from django.contrib.auth import authenticate
 from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import User
 from .serializers import RegisterSerializer
@@ -31,3 +34,26 @@ class RegisterView(generics.GenericAPIView):
         serializer.save()
 
         return Response()
+
+class LoginView(TokenObtainPairView):
+    """Takes a set of user credentials. 
+    If the credentials are valid, 
+    returns an access and refresh JSON web token pair."""
+
+    serializer_class = TokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        
+        user = authenticate(request, email=email, password=password)
+
+        if not user:
+            response = Response({
+                'error_code': 1,
+                'error_message': 'Email and/or password is incorrect.'
+            })
+            return response
+
+        response = super().post(request, *args, **kwargs)
+        return response
