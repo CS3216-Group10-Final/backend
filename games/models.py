@@ -9,16 +9,16 @@ class Genre(models.Model):
 class Platform(models.Model):
     name = models.CharField(max_length=50)
 
-class Game(ProtoBufMixin, models.Model):
+class Game(models.Model):
     pb_model = igdbapi_pb2.GameResult
 
     name = models.CharField(max_length=250)
-    #cover = models.CharField(max_length=250)
-    #genre = models.ManyToManyField(Genre)
+    cover = models.CharField(max_length=250, blank=True)
+    #genres = models.ManyToManyField(Genre, related_name='games')
     #platform = models.ManyToManyField(Platform)
 
     def __str__(self) -> str:
-        return self.name
+        return self.name + self.cover
 
 class GameEntry(models.Model):
     class GameEntryStatus(models.IntegerChoices):

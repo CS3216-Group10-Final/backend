@@ -39,9 +39,12 @@ def updateGames():
     headers = {"Client-ID": client_id, "Authorization": "Bearer " + token}
     r = requests.post(url, data='fields name, cover.url; where id=(22,33);', headers=headers)
     data = r.json()
-    print(data)
-    serializer = GameSerializer(data=data, many=True)
-    serializer.is_valid()
-    serializer.save()
-    print(Game.objects.all())
+    for game in data:
+        game['cover'] = game['cover']['url']
+        serializer = GameSerializer(data=game)
+        print(serializer.is_valid())
+        print(serializer.errors)
+        print(serializer.save())
+    serializer = GameSerializer(Game.objects.all(), many=True)
+    print(serializer.data)
 
