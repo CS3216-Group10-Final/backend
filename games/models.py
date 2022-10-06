@@ -10,10 +10,10 @@ class Platform(models.Model):
     name = models.CharField(max_length=50)
 
 class Game(ProtoBufMixin, models.Model):
-    pb_model = igdbapi_pb2.Game
+    pb_model = igdbapi_pb2.GameResult
 
     name = models.CharField(max_length=250)
-    #image = models.ImageField()
+    #cover = models.CharField(max_length=250)
     #genre = models.ManyToManyField(Genre)
     #platform = models.ManyToManyField(Platform)
 
