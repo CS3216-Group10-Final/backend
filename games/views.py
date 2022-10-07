@@ -99,4 +99,11 @@ class GameEntryView(APIView):
             response = Response("Game entry not found.", status=status.HTTP_404_NOT_FOUND)
         return response
 
-
+    def delete(self, request, id):
+        try:
+            game = GameEntry.objects.get(id__iexact=id)
+            game.delete()
+            response = Response(game.__str__())
+        except:
+            response = Response("Game entry not found.", status=status.HTTP_404_NOT_FOUND)
+        return response
