@@ -50,7 +50,4 @@ class GameEntriesView(APIView):
         search_query = request.query_params.get('query')
         user_id = request.query_params.get('user_id')
         game_id = request.query_params.get('game_id')
-        
-            
-
 
