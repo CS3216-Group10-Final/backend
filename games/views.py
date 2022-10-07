@@ -76,4 +76,34 @@ class GameEntriesView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class GameEntryView(APIView):
 
+    def get(self, request, id):
+        try:
+            game = GameEntry.objects.get(id__iexact=id)
+            serializer = GameEntrySerializer(game)
+            response = Response(serializer.data)
+        except:
+            response = Response("Game entry not found.", status=status.HTTP_404_NOT_FOUND)
+        return response
+
+    def put(self, request, id):
+        try:
+            game = GameEntry.objects.get(id__iexact=id)
+            serializer = GameEntrySerializer(game, data=request.data)
+            if serializer.is_valid():
+                response = Response(serializer.save().__str__())
+            else:
+                response = Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            response = Response("Game entry not found.", status=status.HTTP_404_NOT_FOUND)
+        return response
+
+    def delete(self, request, id):
+        try:
+            game = GameEntry.objects.get(id__iexact=id)
+            game.delete()
+            response = Response(game.__str__())
+        except:
+            response = Response("Game entry not found.", status=status.HTTP_404_NOT_FOUND)
+        return response
