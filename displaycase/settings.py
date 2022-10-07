@@ -13,9 +13,14 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 import sys
 import dj_database_url
+
 from django.core.management.utils import get_random_secret_key
 from datetime import timedelta
+from dotenv import load_dotenv
 from pathlib import Path
+
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -163,8 +168,9 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication', # For debugging in development
     ],
-    'PAGE_SIZE': 20
+    'PAGE_SIZE': 50
 }
+
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL = True
