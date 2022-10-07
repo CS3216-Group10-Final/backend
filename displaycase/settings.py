@@ -40,6 +40,7 @@ DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
+    'displaycase-kjo4q.ondigitalocean.app',
 ]
 
 
