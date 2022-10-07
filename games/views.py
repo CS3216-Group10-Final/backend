@@ -72,7 +72,7 @@ class GameEntriesView(APIView):
         data = request.data
         serializer = GameEntrySerializer(data=data)
         if serializer.is_valid():
-            return Response(serializer.save())
+            return Response(serializer.save().__str__())
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
