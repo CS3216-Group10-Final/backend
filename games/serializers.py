@@ -1,7 +1,7 @@
 from platform import platform
 from typing import Dict
 from rest_framework import serializers
-from .models import Game, Genre
+from .models import Game, GameEntry, Genre
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,6 +21,11 @@ class GameSerializer(serializers.ModelSerializer):
             return value['url']
         raise serializers.ValidationError("Invalid format: cover")
     '''  
+
+class GameEntrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GameEntry
+        fields = '__all__'
 
 
 
