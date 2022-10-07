@@ -40,7 +40,8 @@ def updateGames():
     r = requests.post(url, data='fields name, cover.url; where id=(22,33);', headers=headers)
     data = r.json()
     for game in data:
-        game['cover'] = game['cover']['url']
+        url = game['cover']['url']
+        game['cover'] = url.replace('t_thumb', 't_1080p')
         serializer = GameSerializer(data=game)
         print(serializer.is_valid())
         print(serializer.errors)
