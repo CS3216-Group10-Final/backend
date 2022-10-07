@@ -1,7 +1,7 @@
 from django.db import models
 from pb_model.models import ProtoBufMixin
 from displaycase import igdbapi_pb2
-#from users.models import User
+from users.models import User
 
 
 class Genre(models.Model):
