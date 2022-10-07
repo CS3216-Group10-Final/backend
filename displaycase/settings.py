@@ -153,7 +153,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication', # For debugging in development
     ],
-    'PAGE_SIZE': 20
+    'PAGE_SIZE': 50
 }
 
 CORS_ORIGIN_ALLOW_ALL = True

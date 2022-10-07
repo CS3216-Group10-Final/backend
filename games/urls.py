@@ -3,5 +3,6 @@ from rest_framework_simplejwt import views
 from games import views
 
 urlpatterns = [
-    re_path(r'games/update/?$', views.UpdateGamesTest.as_view(), name='get-games'),
+    re_path(r'games/?$', views.GamesView.as_view(), name='get-games'),
+    re_path(r'games/(?P<id>\d+)/?$', views.GameView.as_view(), name='get-game'),
 ]
