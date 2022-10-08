@@ -14,10 +14,10 @@ class PlatformSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class GameSerializer(serializers.ModelSerializer):
-
+    #first_release_date = serializers.DateTimeField(input_formats=)
     class Meta:
         model = Game
-        fields = '__all__'#['id', 'name', 'cover', 'genres', 'platforms', 'franchise']
+        fields = '__all__'
 
 
 class GameEntrySerializer(serializers.ModelSerializer):

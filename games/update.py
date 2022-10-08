@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.shortcuts import render
 from django.db.models import Q
 from django.shortcuts import render
@@ -37,7 +38,7 @@ def updateGames():
         
     url = "https://api.igdb.com/v4/games"
     headers = {"Client-ID": client_id, "Authorization": "Bearer " + token}
-    query = 'fields name, cover.url, genres.name, platforms.name; where id=(22,33);'
+    query = 'fields name, cover.url, genres.name, platforms.name, first_release_date; where id=(44,55);'
     r = requests.post(url, data=query, headers=headers)
     data = r.json()
     for game in data:
@@ -45,6 +46,7 @@ def updateGames():
         game['cover'] = url.replace('t_thumb', 't_1080p')
         game['genres'] = list(map(lambda a : a['name'], game['genres']))
         game['platforms'] = list(map(lambda a : a['name'], game['platforms']))
+        game['first_release_date'] = datetime.utcfromtimestamp(game['first_release_date']).isoformat()
         serializer = GameSerializer(data=game)
         print(serializer.is_valid())
         print(serializer.errors)
