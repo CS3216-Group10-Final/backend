@@ -95,9 +95,9 @@ class UserListView(APIView):
 
 class UserDetailView(APIView):
     
-    def get(self, request, id):
+    def get(self, request, username):
         try:
-            user = User.objects.get(id__iexact=id)
+            user = User.objects.get(username__iexact=username)
             serializer = UserSerializer(user)
             response = Response(serializer.data)
         except:
