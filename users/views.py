@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate
-from rest_framework import generics
+from rest_framework import generics, status, permissions
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -90,4 +90,15 @@ class UserListView(APIView):
         queryset = paginator.paginate_queryset(users, request)
         serializer = UserSerializer(queryset, many=True)
         response = Response(serializer.data)
+        return response
+
+class UserDetailView(APIView):
+    
+    def get(self, request, id):
+        try:
+            user = User.objects.get(id__iexact=id)
+            serializer = UserSerializer(user)
+            response = Response(serializer.data)
+        except:
+            response = Response("User not found.", status=status.HTTP_404_NOT_FOUND)
         return response

@@ -9,4 +9,5 @@ urlpatterns = [
     re_path('tokens/refresh/?$', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     re_path('tokens/verify/?$', views.TokenVerifyView.as_view(), name='token_verify'),
     re_path(r'users/?$', views.UserListView.as_view(), name='user-list'),
+    re_path(r'users/(?P<id>\d+)/?$', views.UserDetailView.as_view(), name='user-detail'),
 ]
