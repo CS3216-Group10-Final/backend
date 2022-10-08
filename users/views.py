@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate
 from rest_framework import generics, status, permissions
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt import views as jwt_views
@@ -105,9 +106,22 @@ class UserDetailView(APIView):
 
 class SelfUserDetailView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     
     def get(self, request):
         user = request.user
         serializer = UserSerializer(user)
+        response = Response(serializer.data)
+        return response
+
+    def patch(self, request):
+        user = request.user
+        serializer = UserSerializer(user, data=request.data, partial=True)
+
+        if not serializer.is_valid():
+            response = Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return response
+
+        serializer.save()
         response = Response(serializer.data)
         return response
