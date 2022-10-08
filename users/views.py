@@ -11,7 +11,7 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.tokens import UntypedToken
 
 from .models import User
-from .serializers import RegisterSerializer, UserSerializer
+from .serializers import RegisterSerializer, UserSerializer, UserStatsSerializer
 
 class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
@@ -98,10 +98,12 @@ class UserDetailView(APIView):
     def get(self, request, username):
         try:
             user = User.objects.get(username__iexact=username)
-            serializer = UserSerializer(user)
-            response = Response(serializer.data)
         except:
             response = Response("User not found.", status=status.HTTP_404_NOT_FOUND)
+            return response
+        
+        serializer = UserSerializer(user)
+        response = Response(serializer.data)
         return response
 
 class SelfUserDetailView(APIView):
@@ -123,5 +125,17 @@ class SelfUserDetailView(APIView):
             return response
 
         serializer.save()
+        response = Response(serializer.data)
+        return response
+
+class UserStatsView(APIView):
+    def get(self, request, username):
+        try:
+            user = User.objects.get(username__iexact=username)
+        except:
+            response = Response("User not found.", status=status.HTTP_404_NOT_FOUND)
+            return response
+        
+        serializer = UserStatsSerializer(user)
         response = Response(serializer.data)
         return response

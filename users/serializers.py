@@ -28,3 +28,22 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'profile_picture_link']
         extra_kwargs = {'username': {'read_only': True}}
+
+class UserStatsSerializer(serializers.ModelSerializer):
+    average_rating = serializers.FloatField(source='get_average_rating', read_only=True)
+    game_status_distribution = serializers.DictField(
+        source='get_game_status_distribution', 
+        child=serializers.IntegerField(), 
+        read_only=True)
+    # game_status_distribution = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            'average_rating',
+            'game_status_distribution',
+        ]
+    
+    # def get_game_status_distribution(self, obj):
+        # return {1: 1}
+        # return {int(key) : value for key, value in obj.get_game_status_distribution().items()}

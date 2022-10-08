@@ -11,4 +11,5 @@ urlpatterns = [
     re_path(r'users/?$', views.UserListView.as_view(), name='user-list'),
     re_path(r'users/(?P<username>\w+)/?$', views.UserDetailView.as_view(), name='user-detail'),
     re_path(r'user/?$', views.SelfUserDetailView.as_view(), name='self-user-detail'),
+    re_path(r'users/(?P<username>\w+)/stats/?$', views.UserStatsView.as_view(), name='user-stats'),
 ]

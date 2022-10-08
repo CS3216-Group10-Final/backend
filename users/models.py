@@ -1,5 +1,7 @@
+from django.apps import apps
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.db.models import Avg
 
 class UserManager(BaseUserManager):
     """A custom model manager for the custom User model that uses email instead of username."""
@@ -48,3 +50,18 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username']
 
     objects = UserManager()
+
+    def get_average_rating(self):
+        return self.game_entries.aggregate(Avg('rating'))['rating__avg']
+
+    def get_game_status_distribution(self):
+        GameEntry = apps.get_model('games', 'GameEntry')
+        game_entries = self.game_entries
+
+        distribution = {}
+        for status in GameEntry.GameEntryStatus:
+            count = game_entries.filter(status=status).count()
+            distribution[status] = count
+        
+        return distribution
+    
