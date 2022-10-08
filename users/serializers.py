@@ -16,3 +16,15 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
 
         return user
+
+class UserSerializer(serializers.ModelSerializer):
+    profile_picture_link = serializers.ImageField(
+        use_url=True, 
+        required=False, 
+        allow_empty_file=True,
+        allow_null=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'profile_picture_link']
+        extra_kwargs = {'username': {'read_only': True}}
