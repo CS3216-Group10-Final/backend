@@ -1,22 +1,26 @@
 from django.db import models
-from pb_model.models import ProtoBufMixin
-from displaycase import igdbapi_pb2
 from users.models import User
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, primary_key=True)
+
+    def __str__(self) -> str:
+        return self.name
 
 class Platform(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=80, primary_key=True)
+
+    def __str__(self) -> str:
+        return self.name
 
 class Game(models.Model):
-    pb_model = igdbapi_pb2.GameResult
 
     name = models.CharField(max_length=250)
     cover = models.CharField(max_length=250, blank=True)
-    #genres = models.ManyToManyField(Genre, related_name='games')
-    #platform = models.ManyToManyField(Platform)
+    genres = models.ManyToManyField(Genre, related_name='games')
+    platforms = models.ManyToManyField(Platform, related_name='games')
+    first_release_date = models.DateTimeField()
 
     def __str__(self) -> str:
         return self.name
