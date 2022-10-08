@@ -1,6 +1,8 @@
 from django.contrib.auth import authenticate
 from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt import views as jwt_views
 from rest_framework_simplejwt import serializers as jwt_serializers
 from rest_framework_simplejwt.exceptions import InvalidToken
@@ -8,7 +10,7 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.tokens import UntypedToken
 
 from .models import User
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer, UserSerializer
 
 class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
@@ -72,4 +74,20 @@ class TokenVerifyView(jwt_views.TokenVerifyView):
             raise InvalidToken("Token is blacklisted")
         
         response = super().post(request, *args, **kwargs)
+        return response
+
+class UserListView(APIView):
+
+    def get(self, request):
+        search_query = request.query_params.get('query')
+        paginator = PageNumberPagination()
+
+        users = User.objects.all().order_by('username')
+
+        if search_query:
+            users = users.filter(username__icontains=search_query)
+        
+        queryset = paginator.paginate_queryset(users, request)
+        serializer = UserSerializer(queryset, many=True)
+        response = Response(serializer.data)
         return response
