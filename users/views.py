@@ -102,3 +102,12 @@ class UserDetailView(APIView):
         except:
             response = Response("User not found.", status=status.HTTP_404_NOT_FOUND)
         return response
+
+class SelfUserDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        response = Response(serializer.data)
+        return response
