@@ -20,6 +20,7 @@ class GamesView(APIView):
     def get(self, request):
         search_query = request.query_params.get('query')
         paginator = PageNumberPagination()
+        paginator.page_size = 20
 
         games = Game.objects.all().order_by('name')
 

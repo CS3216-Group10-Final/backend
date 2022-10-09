@@ -18,7 +18,6 @@ class GameSerializer(serializers.ModelSerializer):
         model = Game
         fields = '__all__'
 
-
 class GameEntrySerializer(serializers.ModelSerializer):
     game_name = serializers.CharField(source='game.name')
     game_cover = serializers.CharField(source='game.cover')
