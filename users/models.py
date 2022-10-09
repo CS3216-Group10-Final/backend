@@ -84,3 +84,14 @@ class User(AbstractUser):
             count = game_entries.filter(game__platforms=platform).count()
             distribution[platform] = count
         return distribution
+    
+    def get_release_year_distribution(self):
+        game_entries = self.game_entries
+        years = [entry.game.first_release_date.year for entry in game_entries.all()]
+        years.sort()
+
+        distribution = {}
+        for year in years:
+            count = game_entries.filter(game__first_release_date__year=year).count()
+            distribution[year] = count
+        return distribution
