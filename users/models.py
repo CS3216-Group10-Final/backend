@@ -2,6 +2,7 @@ from django.apps import apps
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.db.models import Avg
+from django.utils import timezone
 
 class UserManager(BaseUserManager):
     """A custom model manager for the custom User model that uses email instead of username."""
@@ -87,11 +88,30 @@ class User(AbstractUser):
     
     def get_release_year_distribution(self):
         game_entries = self.game_entries
-        years = [entry.game.first_release_date.year for entry in game_entries.all()]
-        years.sort()
-
         distribution = {}
-        for year in years:
-            count = game_entries.filter(game__first_release_date__year=year).count()
-            distribution[year] = count
+        for entry in game_entries.all():
+            year = entry.game.first_release_date.year
+            if year in distribution:
+                distribution[year] += 1
+            else:
+                distribution[year] = 1
+
+        return distribution
+
+    def get_play_year_distribution(self):
+        game_entries = self.game_entries
+        distribution = {}
+        for entry in game_entries.all():
+            if not entry.time_started:
+                continue
+
+            start_year = entry.time_started.year
+            end_year = entry.time_completed.year if entry.time_completed else timezone.now().year
+
+            for year in range(start_year, end_year + 1):
+                if year in distribution:
+                    distribution[year] += 1
+                else:
+                    distribution[year] = 1
+
         return distribution
