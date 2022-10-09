@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 from django.shortcuts import render
 from django.db.models import Q
 from django.shortcuts import render
@@ -38,21 +39,31 @@ def updateGames():
         
     url = "https://api.igdb.com/v4/games"
     headers = {"Client-ID": client_id, "Authorization": "Bearer " + token}
-    query = 'fields name, cover.url, genres.name, platforms.name, first_release_date; where id=(44,55);'
-    r = requests.post(url, data=query, headers=headers)
-    data = r.json()
-    for game in data:
-        url = game['cover']['url']
-        game['cover'] = url.replace('t_thumb', 't_1080p')
-        game['genres'] = list(map(lambda a : a['name'], game['genres']))
-        game['platforms'] = list(map(lambda a : a['name'], game['platforms']))
-        game['first_release_date'] = datetime.utcfromtimestamp(game['first_release_date']).isoformat()
-        serializer = GameSerializer(data=game)
-        print(serializer.is_valid())
-        print(serializer.errors)
-        print(serializer.save())
-    serializer = GameSerializer(Game.objects.all(), many=True)
-    print(serializer.data)
+    offset = 0
+    while offset < 208000:
+        query = 'fields name, cover.url, genres.name, platforms.name, first_release_date; limit 500; offset '
+        query += str(offset) + ';'
+        r = requests.post(url, data=query, headers=headers)
+        data = r.json()
+        for game in data:
+            
+            if 'cover' in game:
+                cover_url = game['cover']['url']
+                game['cover'] = 'https:' + cover_url.replace('t_thumb', 't_1080p')
+            if 'genres' in game:
+                game['genres'] = list(map(lambda a : a['name'], game['genres']))
+            if 'platforms' in game:
+                game['platforms'] = list(map(lambda a : a['name'], game['platforms']))
+            if 'first_release_date' in game:
+                game['first_release_date'] = datetime.utcfromtimestamp(game['first_release_date']).isoformat()
+            serializer = GameSerializer(data=game)
+            #print(game)
+            if not serializer.is_valid():
+                print(serializer.errors)
+            serializer.save()
+        print(offset)
+        offset += 500
+    
 
 def updateGenres():
     token = os.getenv("TWITCH_AUTH")

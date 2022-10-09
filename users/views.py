@@ -94,7 +94,6 @@ class UserListView(APIView):
         response.headers = {
             'Pages': str(paginator.page.paginator.num_pages),
             'Access-Control-Expose-Headers': '*'}
-        
         return response
 
 class UserDetailView(APIView):
