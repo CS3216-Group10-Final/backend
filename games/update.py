@@ -41,7 +41,7 @@ def updateGames():
     headers = {"Client-ID": client_id, "Authorization": "Bearer " + token}
     offset = 0
     while offset < 208000:
-        query = 'fields name, cover.url, genres.name, platforms.name, first_release_date; limit 500; offset '
+        query = 'fields name, cover.url, genres.name, platforms.name, first_release_date, summary, franchise.name; limit 500; offset '
         query += str(offset) + ';'
         r = requests.post(url, data=query, headers=headers)
         data = r.json()
@@ -56,6 +56,8 @@ def updateGames():
                 game['platforms'] = list(map(lambda a : a['name'], game['platforms']))
             if 'first_release_date' in game:
                 game['first_release_date'] = datetime.utcfromtimestamp(game['first_release_date']).isoformat()
+            if 'franchise' in game:
+                game['franchise'] = game['franchise']['name']
             serializer = GameSerializer(data=game)
             #print(game)
             if not serializer.is_valid():
