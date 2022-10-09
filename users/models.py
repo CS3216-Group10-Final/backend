@@ -53,7 +53,10 @@ class User(AbstractUser):
     objects = UserManager()
 
     def get_average_rating(self):
-        return self.game_entries.aggregate(Avg('rating'))['rating__avg']
+        average_rating = self.game_entries.aggregate(Avg('rating'))['rating__avg']
+        if not average_rating:
+            return 0
+        return average_rating
 
     def get_game_status_distribution(self):
         GameEntry = apps.get_model('games', 'GameEntry')
