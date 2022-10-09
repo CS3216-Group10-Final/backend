@@ -70,23 +70,29 @@ class User(AbstractUser):
         return distribution
     
     def get_game_genre_distribution(self):
-        Genre = apps.get_model('games', 'Genre')
         game_entries = self.game_entries
-
         distribution = {}
-        for genre in Genre.objects.all():
-            count = game_entries.filter(game__genres=genre).count()
-            distribution[genre] = count
+        for entry in game_entries.all():
+            genres = entry.game.genres.all()
+            for genre in genres:
+                if genre in distribution:
+                    distribution[genre] += 1
+                else:
+                    distribution[genre] = 1
+
         return distribution
     
     def get_platform_distribution(self):
-        Platform = apps.get_model('games', 'Platform')
         game_entries = self.game_entries
-
         distribution = {}
-        for platform in Platform.objects.all():
-            count = game_entries.filter(game__platforms=platform).count()
-            distribution[platform] = count
+        for entry in game_entries.all():
+            platforms = entry.game.platforms.all()
+            for platform in platforms:
+                if platform in distribution:
+                    distribution[platform] += 1
+                else:
+                    distribution[platform] = 1
+
         return distribution
     
     def get_release_year_distribution(self):
