@@ -35,15 +35,30 @@ class UserStatsSerializer(serializers.ModelSerializer):
         source='get_game_status_distribution', 
         child=serializers.IntegerField(), 
         read_only=True)
-    # game_status_distribution = serializers.SerializerMethodField()
+    game_genre_distribution = serializers.DictField(
+        source='get_game_genre_distribution', 
+        child=serializers.IntegerField(), 
+        read_only=True)
+    platform_distribution = serializers.DictField(
+        source='get_platform_distribution', 
+        child=serializers.IntegerField(), 
+        read_only=True)
+    release_year_distribution = serializers.DictField(
+        source='get_release_year_distribution', 
+        child=serializers.IntegerField(), 
+        read_only=True)
+    play_year_distribution = serializers.DictField(
+        source='get_play_year_distribution', 
+        child=serializers.IntegerField(), 
+        read_only=True)
 
     class Meta:
         model = User
         fields = [
             'average_rating',
             'game_status_distribution',
+            'game_genre_distribution',
+            'platform_distribution',
+            'release_year_distribution',
+            'play_year_distribution',
         ]
-    
-    # def get_game_status_distribution(self, obj):
-        # return {1: 1}
-        # return {int(key) : value for key, value in obj.get_game_status_distribution().items()}

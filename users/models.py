@@ -2,6 +2,7 @@ from django.apps import apps
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.db.models import Avg
+from django.utils import timezone
 
 class UserManager(BaseUserManager):
     """A custom model manager for the custom User model that uses email instead of username."""
@@ -52,7 +53,10 @@ class User(AbstractUser):
     objects = UserManager()
 
     def get_average_rating(self):
-        return self.game_entries.aggregate(Avg('rating'))['rating__avg']
+        average_rating = self.game_entries.aggregate(Avg('rating'))['rating__avg']
+        if not average_rating:
+            return 0
+        return average_rating
 
     def get_game_status_distribution(self):
         GameEntry = apps.get_model('games', 'GameEntry')
@@ -65,3 +69,52 @@ class User(AbstractUser):
         
         return distribution
     
+    def get_game_genre_distribution(self):
+        Genre = apps.get_model('games', 'Genre')
+        game_entries = self.game_entries
+
+        distribution = {}
+        for genre in Genre.objects.all():
+            count = game_entries.filter(game__genres=genre).count()
+            distribution[genre] = count
+        return distribution
+    
+    def get_platform_distribution(self):
+        Platform = apps.get_model('games', 'Platform')
+        game_entries = self.game_entries
+
+        distribution = {}
+        for platform in Platform.objects.all():
+            count = game_entries.filter(game__platforms=platform).count()
+            distribution[platform] = count
+        return distribution
+    
+    def get_release_year_distribution(self):
+        game_entries = self.game_entries
+        distribution = {}
+        for entry in game_entries.all():
+            year = entry.game.first_release_date.year
+            if year in distribution:
+                distribution[year] += 1
+            else:
+                distribution[year] = 1
+
+        return distribution
+
+    def get_play_year_distribution(self):
+        game_entries = self.game_entries
+        distribution = {}
+        for entry in game_entries.all():
+            if not entry.time_started:
+                continue
+
+            start_year = entry.time_started.year
+            end_year = entry.time_completed.year if entry.time_completed else timezone.now().year
+
+            for year in range(start_year, end_year + 1):
+                if year in distribution:
+                    distribution[year] += 1
+                else:
+                    distribution[year] = 1
+
+        return distribution
