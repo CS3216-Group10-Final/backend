@@ -74,3 +74,13 @@ class User(AbstractUser):
             count = game_entries.filter(game__genres=genre).count()
             distribution[genre] = count
         return distribution
+    
+    def get_platform_distribution(self):
+        Platform = apps.get_model('games', 'Platform')
+        game_entries = self.game_entries
+
+        distribution = {}
+        for platform in Platform.objects.all():
+            count = game_entries.filter(game__platforms=platform).count()
+            distribution[platform] = count
+        return distribution

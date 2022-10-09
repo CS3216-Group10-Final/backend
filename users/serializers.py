@@ -39,6 +39,10 @@ class UserStatsSerializer(serializers.ModelSerializer):
         source='get_game_genre_distribution', 
         child=serializers.IntegerField(), 
         read_only=True)
+    platform_distribution = serializers.DictField(
+        source='get_platform_distribution', 
+        child=serializers.IntegerField(), 
+        read_only=True)
     # game_status_distribution = serializers.SerializerMethodField()
 
     class Meta:
@@ -47,6 +51,7 @@ class UserStatsSerializer(serializers.ModelSerializer):
             'average_rating',
             'game_status_distribution',
             'game_genre_distribution',
+            'platform_distribution',
         ]
     
     # def get_game_status_distribution(self, obj):
