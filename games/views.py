@@ -30,7 +30,9 @@ class GamesView(APIView):
         queryset = paginator.paginate_queryset(games, request)
         serializer = GameSerializer(queryset, many=True)
         response = Response(serializer.data)
-        response.headers = {'Pages': str(paginator.page.paginator.num_pages)}
+        response.headers = {
+            'Pages': str(paginator.page.paginator.num_pages),
+            'Access-Control-Expose-Headers': '*'}
         return response
 
 class GameView(APIView):
@@ -67,7 +69,9 @@ class GameEntriesView(APIView):
         queryset = paginator.paginate_queryset(entries, request)
         serializer = GameEntrySerializer(queryset, many=True)
         response = Response(serializer.data)
-        response.headers = {'Pages': str(paginator.page.paginator.num_pages)}
+        response.headers = {
+            'Pages': str(paginator.page.paginator.num_pages),
+            'Access-Control-Expose-Headers': '*'}
         return response
         
     def post(self, request):
