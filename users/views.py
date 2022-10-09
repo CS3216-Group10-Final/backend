@@ -91,6 +91,7 @@ class UserListView(APIView):
         queryset = paginator.paginate_queryset(users, request)
         serializer = UserSerializer(queryset, many=True)
         response = Response(serializer.data)
+        response.headers = {'Pages': str(paginator.page.paginator.num_pages)}
         return response
 
 class UserDetailView(APIView):

@@ -14,10 +14,9 @@ from displaycase import igdbapi_pb2
 import requests
 import os
 
-# Create your views here.
 
 class GamesView(APIView):
-
+    
     def get(self, request):
         search_query = request.query_params.get('query')
         paginator = PageNumberPagination()
@@ -30,6 +29,7 @@ class GamesView(APIView):
         queryset = paginator.paginate_queryset(games, request)
         serializer = GameSerializer(queryset, many=True)
         response = Response(serializer.data)
+        response.headers = {'Pages': str(paginator.page.paginator.num_pages)}
         return response
 
 class GameView(APIView):
@@ -66,6 +66,7 @@ class GameEntriesView(APIView):
         queryset = paginator.paginate_queryset(entries, request)
         serializer = GameEntrySerializer(queryset, many=True)
         response = Response(serializer.data)
+        response.headers = {'Pages': str(paginator.page.paginator.num_pages)}
         return response
         
     def post(self, request):
