@@ -21,6 +21,8 @@ class Game(models.Model):
     genres = models.ManyToManyField(Genre, related_name='games', blank=True)
     platforms = models.ManyToManyField(Platform, related_name='games', blank=True)
     first_release_date = models.DateTimeField(blank=True, null=True)
+    summary = models.TextField(blank=True)
+    franchise = models.CharField(max_length=250, blank=True)
 
     def __str__(self) -> str:
         return self.name
