@@ -14,16 +14,19 @@ class PlatformSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class GameSerializer(serializers.ModelSerializer):
-    #first_release_date = serializers.DateTimeField(input_formats=)
     class Meta:
         model = Game
         fields = '__all__'
 
-
 class GameEntrySerializer(serializers.ModelSerializer):
+    game_name = serializers.CharField(source='game.name')
+    game_cover = serializers.CharField(source='game.cover')
+    game_id = serializers.IntegerField(source='game.id')
+    user_id = serializers.IntegerField(source='user.id')
+
     class Meta:
         model = GameEntry
-        fields = '__all__'
+        exclude = ['game', 'user']
 
 
 
