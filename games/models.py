@@ -16,6 +16,7 @@ class Platform(models.Model):
 
 class Game(models.Model):
 
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=250)
     cover = models.CharField(max_length=250, blank=True)
     genres = models.ManyToManyField(Genre, related_name='games', blank=True)
@@ -23,6 +24,8 @@ class Game(models.Model):
     first_release_date = models.DateTimeField(blank=True, null=True)
     summary = models.TextField(blank=True)
     franchise = models.CharField(max_length=250, blank=True)
+    rating_count = models.IntegerField(default=0)
+    alternative_names = models.TextField(blank=True)
 
     def __str__(self) -> str:
         return self.name
