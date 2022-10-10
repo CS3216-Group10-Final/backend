@@ -21,10 +21,10 @@ class GamesView(APIView):
         search_query = request.query_params.get('query')
         paginator = PageNumberPagination()
 
-        games = Game.objects.all().order_by('name')
+        games = Game.objects.all().order_by('-rating_count', '-first_release_date')
 
         if search_query:
-            games = games.filter(name__icontains=search_query)
+            games = games.filter(Q(name__icontains=search_query) | Q(alternative_names__icontains=search_query))
         
         queryset = paginator.paginate_queryset(games, request)
         serializer = GameSerializer(queryset, many=True)

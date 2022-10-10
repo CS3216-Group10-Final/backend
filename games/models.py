@@ -25,6 +25,7 @@ class Game(models.Model):
     summary = models.TextField(blank=True)
     franchise = models.CharField(max_length=250, blank=True)
     rating_count = models.IntegerField(default=0)
+    alternative_names = models.TextField(blank=True)
 
     def __str__(self) -> str:
         return self.name
