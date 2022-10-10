@@ -2,6 +2,7 @@ from platform import platform
 from typing import Dict
 from rest_framework import serializers
 from .models import Game, GameEntry, Genre, Platform
+from users.models import User
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,14 +20,13 @@ class GameSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class GameEntrySerializer(serializers.ModelSerializer):
-    game_name = serializers.CharField(source='game.name')
-    game_cover = serializers.CharField(source='game.cover')
-    game_id = serializers.IntegerField(source='game.id')
-    user_id = serializers.IntegerField(source='user.id')
+    game_name = serializers.CharField(source='game.name', read_only=True)
+    game_cover = serializers.CharField(source='game.cover', read_only=True)
+    game_id = serializers.PrimaryKeyRelatedField(source='game', queryset = Game.objects.all())
+    user_id = serializers.PrimaryKeyRelatedField(source='user', queryset = User.objects.all())
 
     class Meta:
         model = GameEntry
         exclude = ['game', 'user']
-
 
 
