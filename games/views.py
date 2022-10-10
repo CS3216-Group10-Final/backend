@@ -77,10 +77,13 @@ class GameEntriesView(APIView):
     def post(self, request):
         data = request.data
         serializer = GameEntrySerializer(data=data)
-        if serializer.is_valid():
-            return Response(serializer.save().__str__())
-        else:
+        if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        queryset = GameEntry.objects.filter(game__id=data['game_id'], user__id=data['user_id'])
+        if len(queryset) > 0:
+            return Response("GameEntry already exists.", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return Response(serializer.save().__str__())
+
 
 class GameEntryView(APIView):
 
