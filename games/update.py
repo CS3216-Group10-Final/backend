@@ -70,12 +70,10 @@ def updateGames():
                 serializer = GameSerializer(obj, data=game)
             except:
                 serializer = GameSerializer(data=game)
-            #print(game)
             if not serializer.is_valid():
                 print(serializer.errors)
             else:
                 serializer.save()
-                serializer.create
         print(offset)
         offset += 500
     
