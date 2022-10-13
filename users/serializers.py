@@ -17,6 +17,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return user
 
+class GoogleLoginSerializer(serializers.Serializer):
+    code = serializers.CharField(required=False)
+    error = serializers.CharField(required=False)
+
 class UserSerializer(serializers.ModelSerializer):
     profile_picture_link = serializers.ImageField(
         use_url=True, 
@@ -27,7 +31,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'profile_picture_link']
-        extra_kwargs = {'username': {'read_only': True}}
 
 class UserStatsSerializer(serializers.ModelSerializer):
     average_rating = serializers.FloatField(source='get_average_rating', read_only=True)

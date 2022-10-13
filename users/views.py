@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.contrib.auth import authenticate
+from django.urls import reverse
 from rest_framework import generics, status, permissions
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -11,7 +13,8 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.tokens import UntypedToken
 
 from .models import User
-from .serializers import RegisterSerializer, UserSerializer, UserStatsSerializer
+from .serializers import GoogleLoginSerializer, RegisterSerializer, UserSerializer, UserStatsSerializer
+from .utils import get_google_access_token, get_google_email, get_tokens_for_user
 
 class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
@@ -63,6 +66,41 @@ class LoginView(jwt_views.TokenObtainPairView):
 
         response = super().post(request, *args, **kwargs)
         return response
+
+class GoogleLoginView(APIView):
+    def get(self, request, *args, **kwargs):
+        serializer = GoogleLoginSerializer(data=request.GET)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+
+        code = validated_data.get('code')
+        error = validated_data.get('error')
+
+        if error or not code:
+            response = Response({
+                'error_code': 1,
+                'error_message': 'Failed to login with Google.',
+                'error_message_from_google': error
+            })
+            return response
+
+        domain = settings.BASE_BACKEND_URL
+        path = reverse('google-login')
+        redirect_uri = f'{domain}{path}'
+
+        access_token = get_google_access_token(code=code, redirect_uri=redirect_uri)
+        email = get_google_email(access_token=access_token)
+        
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            email_username = email.split('@')[0]
+            username = User.objects.generate_unique_username_from(email_username)
+            user = User.objects.create_user(username, email, User.objects.make_random_password())
+
+        tokens = get_tokens_for_user(user=user)
+
+        return Response(tokens)
 
 class TokenVerifyView(jwt_views.TokenVerifyView):
     serializer_class = jwt_serializers.TokenVerifySerializer
