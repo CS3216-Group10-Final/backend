@@ -94,7 +94,7 @@ class User(AbstractUser):
         game_entries = self.game_entries
         distribution = {}
         for entry in game_entries.all():
-            platforms = entry.game.platforms.all()
+            platforms = entry.platforms.all()
             for platform in platforms:
                 if platform in distribution:
                     distribution[platform] += 1

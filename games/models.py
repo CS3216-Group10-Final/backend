@@ -41,6 +41,7 @@ class GameEntry(models.Model):
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="game_entries")
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="entries")
+    platforms = models.ManyToManyField(Platform, related_name='game_entries', blank=True)
     rating = models.IntegerField(blank=True, null=True)
     review = models.TextField(blank=True)
     hours = models.IntegerField(blank=True, null=True)
