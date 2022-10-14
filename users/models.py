@@ -39,6 +39,14 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
 
         return self._create_user(username, email, password, **extra_fields)
+    
+    def generate_unique_username_from(self, username):
+        result = username
+        counter = 1
+        while User.objects.filter(username=result):
+            result = username + str(counter)
+            counter += 1
+        return result
 
 class User(AbstractUser):
     def profile_pic_image_path(instance, filename):

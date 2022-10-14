@@ -184,3 +184,17 @@ CORS_ALLOW_CREDENTIALS = True
 # TODO: change to better storage solution
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+# For interaction with external APIs
+if DEVELOPMENT_MODE is True:
+    BASE_BACKEND_URL = 'http://localhost:8000'
+    BASE_FRONTEND_URL = 'http://localhost:8000'
+else:
+    BASE_BACKEND_URL = 'https://displaycase-kjo4q.ondigitalocean.app'
+    BASE_FRONTEND_URL = 'https://displaycase.vercel.app'
+
+# Google OAuth
+GOOGLE_ACCESS_TOKEN_OBTAIN_URL = 'https://oauth2.googleapis.com/token'
+GOOGLE_USER_INFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo'
+GOOGLE_OAUTH2_CLIENT_ID = os.getenv("GOOGLE_OAUTH2_CLIENT_ID")
+GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH2_CLIENT_SECRET")
