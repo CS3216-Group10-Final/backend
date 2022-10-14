@@ -42,7 +42,7 @@ class GameView(APIView):
             game = Game.objects.get(id__iexact=id)
             serializer = GameSerializer(game)
             response = Response(serializer.data)
-        except:
+        except Game.DoesNotExist:
             response = Response("Game not found.", status=status.HTTP_404_NOT_FOUND)
         return response
         
@@ -82,7 +82,8 @@ class GameEntriesView(APIView):
         queryset = GameEntry.objects.filter(game__id=data['game_id'], user__id=data['user_id'])
         if len(queryset) > 0:
             return Response("GameEntry already exists.", status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        return Response(serializer.save().__str__())
+        serializer.save()
+        return Response(serializer.data)
 
 
 class GameEntryView(APIView):
@@ -92,7 +93,7 @@ class GameEntryView(APIView):
             game = GameEntry.objects.get(id__iexact=id)
             serializer = GameEntrySerializer(game)
             response = Response(serializer.data)
-        except:
+        except GameEntry.DoesNotExist:
             response = Response("Game entry not found.", status=status.HTTP_404_NOT_FOUND)
         return response
 
@@ -101,18 +102,20 @@ class GameEntryView(APIView):
             game = GameEntry.objects.get(id__iexact=id)
             serializer = GameEntrySerializer(game, data=request.data)
             if serializer.is_valid():
-                response = Response(serializer.save().__str__())
+                serializer.save()
+                response = Response(serializer.data)
             else:
                 response = Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except:
+        except GameEntry.DoesNotExist:
             response = Response("Game entry not found.", status=status.HTTP_404_NOT_FOUND)
         return response
 
     def delete(self, request, id):
         try:
             game = GameEntry.objects.get(id__iexact=id)
+            serializer = GameEntrySerializer(game)
+            response = Response(serializer.data)
             game.delete()
-            response = Response(game.__str__())
-        except:
+        except GameEntry.DoesNotExist:
             response = Response("Game entry not found.", status=status.HTTP_404_NOT_FOUND)
         return response
