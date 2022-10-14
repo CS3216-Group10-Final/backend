@@ -182,8 +182,17 @@ class SelfUserDetailView(APIView):
     def patch(self, request):
         user = request.user
         serializer = UserSerializer(user, data=request.data, partial=True)
+        
+        username = serializer.initial_data['username']
+        user_with_input_username = User.objects.filter(username=username)
 
-        if not serializer.is_valid():
+        if user_with_input_username and not user_with_input_username == request.user:
+            response = Response({
+                'error_code': 1,
+                'error_message': 'Username is already in use.'
+            })
+            return response
+        elif not serializer.is_valid():
             response = Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return response
 
