@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'activities',
     'pb_model',
     'django_cleanup.apps.CleanupConfig',
+    'social_django',
 ]
 
 MIDDLEWARE = [
@@ -73,6 +74,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.open_id.OpenIdAuth',
+    'social_core.backends.steam.SteamOpenId',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 ROOT_URLCONF = 'displaycase.urls'
 
@@ -87,6 +94,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -198,3 +207,18 @@ GOOGLE_ACCESS_TOKEN_OBTAIN_URL = 'https://oauth2.googleapis.com/token'
 GOOGLE_USER_INFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo'
 GOOGLE_OAUTH2_CLIENT_ID = os.getenv("GOOGLE_OAUTH2_CLIENT_ID")
 GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH2_CLIENT_SECRET")
+
+# Social Auth
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
+SOCIAL_AUTH_STEAM_API_KEY = os.getenv("STEAM_API_KEY")
+SOCIAL_AUTH_AUTHENTICATION_BACKENDS = (
+    'social_core.backends.steam.SteamOpenId',
+)
+SOCIAL_AUTH_STEAM_EXTRA_DATA = ['player']
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'users.pipeline.link_account',
+)

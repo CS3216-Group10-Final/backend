@@ -23,6 +23,7 @@ urlpatterns = [
     path('', include('games.urls')),
     path('', include('users.urls')),
     path('', include('rest_framework.urls')),
+    path('', include('social_django.urls')),
 ]
 
 # TODO: change to better storage solution
