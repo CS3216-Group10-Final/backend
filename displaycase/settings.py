@@ -191,7 +191,7 @@ if DEVELOPMENT_MODE is True:
     BASE_FRONTEND_URL = 'http://localhost:8000'
 else:
     BASE_BACKEND_URL = 'https://displaycase-kjo4q.ondigitalocean.app'
-    BASE_FRONTEND_URL = 'https://displaycase.vercel.app'
+    BASE_FRONTEND_URL = 'https://www.displaycase.me'
 
 # Google OAuth
 GOOGLE_ACCESS_TOKEN_OBTAIN_URL = 'https://oauth2.googleapis.com/token'

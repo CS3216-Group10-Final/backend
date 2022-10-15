@@ -96,7 +96,6 @@ class GoogleLoginCallbackView(APIView):
         error = validated_data.get('error')
 
         login_feedback_url = f'{settings.BASE_FRONTEND_URL}/login/feedback'
-        response = redirect(login_feedback_url)
 
         if error or not code:
             params = urlencode({
