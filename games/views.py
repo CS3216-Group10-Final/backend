@@ -48,7 +48,7 @@ class GameView(APIView):
         
         
 class GameEntriesView(APIView):
-
+    
     def get(self, request):
         search_query = request.query_params.get('query')
         user_id = request.query_params.get('user_id')

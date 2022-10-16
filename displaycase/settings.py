@@ -73,10 +73,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 AUTHENTICATION_BACKENDS = (
-    'social_core.backends.open_id.OpenIdAuth',
     'social_core.backends.steam.SteamOpenId',
     'django.contrib.auth.backends.ModelBackend',
 )
@@ -211,14 +211,22 @@ GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH2_CLIENT_SECRET")
 # Social Auth
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_STEAM_API_KEY = os.getenv("STEAM_API_KEY")
-SOCIAL_AUTH_AUTHENTICATION_BACKENDS = (
-    'social_core.backends.steam.SteamOpenId',
-)
+SOCIAL_AUTH_USER_MODEL = 'users.User'
+
 SOCIAL_AUTH_STEAM_EXTRA_DATA = ['player']
+SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['user',]
+SOCIAL_AUTH_ALLOWED_REDIRECT_HOSTS = ['https://displaycase.me']
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'https://displaycase.me'
+SOCIAL_AUTH_LOGIN_ERROR_URL = 'https://displaycase.me'
+
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
+    #'users.pipeline.debug',
+    #'users.pipeline.load_user',
     'social_core.pipeline.social_auth.social_uid',
-    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.auth_allowed',
+    #'social_core.pipeline.user.create_user',
+    #'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'users.pipeline.link_account',
 )

@@ -30,7 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'profile_picture_link']
+        fields = ['id', 'username', 'profile_picture_link', 'steamid']
 
 class UserStatsSerializer(serializers.ModelSerializer):
     average_rating = serializers.FloatField(source='get_average_rating', read_only=True)
