@@ -182,8 +182,8 @@ class SelfUserDetailView(APIView):
         user = request.user
         serializer = UserSerializer(user, data=request.data, partial=True)
         
-        username = serializer.initial_data['username']
-        user_with_input_username = User.objects.filter(username=username)
+        username = serializer.initial_data.get('username')
+        user_with_input_username = User.objects.filter(username=username).first()
 
         if user_with_input_username and not user_with_input_username == request.user:
             response = Response({
