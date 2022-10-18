@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'users',
     'games',
     'activities',
+    'badges',
     'pb_model',
     'django_cleanup.apps.CleanupConfig',
 ]
