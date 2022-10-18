@@ -14,6 +14,8 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.tokens import UntypedToken
 from urllib.parse import urlencode
 
+from badges import constants as badges_constants
+from badges.models import Badge, BadgeEntry
 from .models import User
 from .serializers import GoogleLoginSerializer, RegisterSerializer, UserSerializer, UserStatsSerializer
 from .utils import get_google_access_token, get_google_email, get_tokens_for_user
@@ -42,7 +44,11 @@ class RegisterView(generics.GenericAPIView):
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        user = serializer.save()
+
+        if User.objects.count() <= badges_constants.PIONEER_BADGE_QUOTA:
+            badge = Badge.objects.get(name='Pioneer')
+            BadgeEntry.objects.create(user=user, badge=badge)
 
         return Response()
 
