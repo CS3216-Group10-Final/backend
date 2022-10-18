@@ -1,4 +1,5 @@
 asgiref==3.5.2
+boto3==1.24.92
 Django==4.1.1
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.0
@@ -6,6 +7,7 @@ django-cors-headers==3.13.0
 django-cleanup==6.0.0
 dj-database-url==1.0.0
 django-pb-model==0.3.3
+django-storages==1.13.1
 gunicorn==20.1.0
 igdb-api-v4==0.0.5
 Pillow==9.2.0
