@@ -4,7 +4,7 @@ from users.models import User
 
 class Badge(models.Model):
     def badge_pic_image_path(instance, filename):
-        return f'badge/{instance.id}/{filename}'
+        return f'badge/{filename}'
 
     name = models.CharField(max_length=250)
     picture = models.ImageField(upload_to=badge_pic_image_path)
