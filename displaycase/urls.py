@@ -22,7 +22,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('games.urls')),
     path('', include('users.urls')),
+    path('', include('activities.urls')),
     path('', include('rest_framework.urls')),
+    path('', include('social_django.urls', namespace='social')),
 ]
 
 # TODO: change to better storage solution

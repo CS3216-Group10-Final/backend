@@ -34,6 +34,11 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'profile_picture_link', 'badges']
 
+class PrivateUserSerializer(UserSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'profile_picture_link', 'badges', 'steamid']
+
 class UserStatsSerializer(serializers.ModelSerializer):
     average_rating = serializers.FloatField(source='get_average_rating', read_only=True)
     game_status_distribution = serializers.DictField(
