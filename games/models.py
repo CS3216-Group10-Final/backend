@@ -53,5 +53,5 @@ class GameEntry(models.Model):
     def __str__(self) -> str:
         return self.id.__str__() + ' ' + self.user.__str__() + ' ' + self.game.__str__()
 
-
+    
 

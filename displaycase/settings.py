@@ -201,6 +201,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 50
 }
 
+# Silence page size warning
+SILENCED_SYSTEM_CHECKS = ['rest_framework.W001']
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL = True

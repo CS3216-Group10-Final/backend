@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.db.models import Q
 from django.shortcuts import render
 from igdb.wrapper import IGDBWrapper
@@ -9,6 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 
 from games.serializers import GameSerializer, GameEntrySerializer
 from .models import Game, GameEntry
+from activities.models import Activity
 
 from displaycase import igdbapi_pb2
 import requests
@@ -100,9 +100,15 @@ class GameEntryView(APIView):
     def put(self, request, id):
         try:
             game = GameEntry.objects.get(id__iexact=id)
+
+            original_status = game.status
+            original_rating = game.rating
+            original_review = game.review
+
             serializer = GameEntrySerializer(game, data=request.data)
             if serializer.is_valid():
-                serializer.save()
+                new_game = serializer.save()
+                Activity.generateActivities(new_game, original_status, original_rating, original_review)
                 response = Response(serializer.data)
             else:
                 response = Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
