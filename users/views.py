@@ -1,3 +1,5 @@
+import re
+
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
@@ -39,6 +41,12 @@ class RegisterView(generics.GenericAPIView):
             response = Response({
                 'error_code': 2,
                 'error_message': 'Email is already in use.'
+            })
+            return response
+        elif not re.search(r'^\w+$', username):
+            response = Response({
+                'error_code': 3,
+                'error_message': 'Username should only contain alphanumeric characters and underscore.'
             })
             return response
 
@@ -198,6 +206,12 @@ class SelfUserDetailView(APIView):
             response = Response({
                 'error_code': 1,
                 'error_message': 'Username is already in use.'
+            })
+            return response
+        elif not re.search(r'^\w+$', username):
+            response = Response({
+                'error_code': 2,
+                'error_message': 'Username should only contain alphanumeric characters and underscore.'
             })
             return response
         elif not serializer.is_valid():
