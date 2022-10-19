@@ -124,6 +124,9 @@ class GoogleLoginCallbackView(APIView):
             email_username = email.split('@')[0]
             username = User.objects.generate_unique_username_from(email_username)
             user = User.objects.create_user(username, email, User.objects.make_random_password())
+            if User.objects.count() <= badges_constants.PIONEER_BADGE_QUOTA:
+                badge = Badge.objects.get(name='Pioneer')
+                BadgeEntry.objects.create(user=user, badge=badge)
 
         tokens = get_tokens_for_user(user=user)
         params = urlencode(tokens)
