@@ -1,3 +1,5 @@
+import re
+
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
@@ -14,6 +16,8 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.tokens import UntypedToken
 from urllib.parse import urlencode
 
+from badges import constants as badges_constants
+from badges.models import Badge, BadgeEntry
 from .models import User
 from .serializers import GoogleLoginSerializer, RegisterSerializer, UserSerializer, UserStatsSerializer
 from .utils import get_google_access_token, get_google_email, get_tokens_for_user
@@ -39,10 +43,20 @@ class RegisterView(generics.GenericAPIView):
                 'error_message': 'Email is already in use.'
             })
             return response
+        elif not re.search(r'^\w+$', username):
+            response = Response({
+                'error_code': 3,
+                'error_message': 'Username should only contain alphanumeric characters and underscore.'
+            })
+            return response
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        user = serializer.save()
+
+        if User.objects.count() <= badges_constants.PIONEER_BADGE_QUOTA:
+            badge = Badge.objects.get(name='Pioneer')
+            BadgeEntry.objects.create(user=user, badge=badge)
 
         return Response()
 
@@ -96,7 +110,6 @@ class GoogleLoginCallbackView(APIView):
         error = validated_data.get('error')
 
         login_feedback_url = f'{settings.BASE_FRONTEND_URL}/login/feedback'
-        response = redirect(login_feedback_url)
 
         if error or not code:
             params = urlencode({
@@ -119,6 +132,9 @@ class GoogleLoginCallbackView(APIView):
             email_username = email.split('@')[0]
             username = User.objects.generate_unique_username_from(email_username)
             user = User.objects.create_user(username, email, User.objects.make_random_password())
+            if User.objects.count() <= badges_constants.PIONEER_BADGE_QUOTA:
+                badge = Badge.objects.get(name='Pioneer')
+                BadgeEntry.objects.create(user=user, badge=badge)
 
         tokens = get_tokens_for_user(user=user)
         params = urlencode(tokens)
@@ -183,13 +199,19 @@ class SelfUserDetailView(APIView):
         user = request.user
         serializer = UserSerializer(user, data=request.data, partial=True)
         
-        username = serializer.initial_data['username']
-        user_with_input_username = User.objects.filter(username=username)
+        username = serializer.initial_data.get('username')
+        user_with_input_username = User.objects.filter(username=username).first()
 
         if user_with_input_username and not user_with_input_username == request.user:
             response = Response({
                 'error_code': 1,
                 'error_message': 'Username is already in use.'
+            })
+            return response
+        elif not re.search(r'^\w+$', username):
+            response = Response({
+                'error_code': 2,
+                'error_message': 'Username should only contain alphanumeric characters and underscore.'
             })
             return response
         elif not serializer.is_valid():

@@ -1,0 +1,1 @@
+[{"model": "badges.badge", "pk": 1, "fields": {"name": "Pioneer", "picture": "badge/pioneer.png", "description": "You are one of the first 50 users!"}}]

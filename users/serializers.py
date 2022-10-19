@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import User
+from badges.serializers import BadgeEntrySerializer
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -27,10 +28,11 @@ class UserSerializer(serializers.ModelSerializer):
         required=False, 
         allow_empty_file=True,
         allow_null=True)
+    badges = BadgeEntrySerializer(many=True, read_only=True, source='badge_entries')
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'profile_picture_link', 'steamid']
+        fields = ['id', 'username', 'profile_picture_link', 'badges', 'steamid']
 
 class UserStatsSerializer(serializers.ModelSerializer):
     average_rating = serializers.FloatField(source='get_average_rating', read_only=True)

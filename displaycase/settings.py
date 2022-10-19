@@ -59,9 +59,11 @@ INSTALLED_APPS = [
     'users',
     'games',
     'activities',
+    'badges',
     'pb_model',
     'django_cleanup.apps.CleanupConfig',
     'social_django',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -156,8 +158,24 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+AWS_ACCESS_KEY_ID = os.getenv('SPACES_KEY')
+AWS_SECRET_ACCESS_KEY = os.getenv('SPACES_SECRET')
+AWS_STORAGE_BUCKET_NAME = 'displaycase'
+AWS_S3_ENDPOINT_URL = 'https://sgp1.digitaloceanspaces.com'
+AWS_S3_CUSTOM_DOMAIN = 'displaycase.sgp1.cdn.digitaloceanspaces.com'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_LOCATION = 'static'
+AWS_DEFAULT_ACL = 'public-read'
+
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+STATIC_URL = '{}/{}/'.format(AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+STATIC_ROOT = 'static/'
+
+#STATIC_URL = '/static/'
+#STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -190,9 +208,9 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 # Media, for user uploaded files
-# TODO: change to better storage solution
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+MEDIA_URL = '{}/{}/'.format(AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+MEDIA_ROOT = 'media/'
 
 # For interaction with external APIs
 if DEVELOPMENT_MODE is True:
@@ -200,7 +218,7 @@ if DEVELOPMENT_MODE is True:
     BASE_FRONTEND_URL = 'http://localhost:8000'
 else:
     BASE_BACKEND_URL = 'https://displaycase-kjo4q.ondigitalocean.app'
-    BASE_FRONTEND_URL = 'https://displaycase.vercel.app'
+    BASE_FRONTEND_URL = 'https://www.displaycase.me'
 
 # Google OAuth
 GOOGLE_ACCESS_TOKEN_OBTAIN_URL = 'https://oauth2.googleapis.com/token'
