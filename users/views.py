@@ -236,8 +236,6 @@ class UserStatsView(APIView):
 
 def get_user(request):
     user = request.user
-    print('checkpt')
-    print(user)
     if user:
         request.session['usr'] = user
         return redirect(reverse('social:complete', args=("backend_name,")))
