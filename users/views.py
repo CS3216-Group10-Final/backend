@@ -208,7 +208,7 @@ class SelfUserDetailView(APIView):
                 'error_message': 'Username is already in use.'
             })
             return response
-        elif not re.search(r'^\w+$', username):
+        elif username and not re.search(r'^\w+$', username):
             response = Response({
                 'error_code': 2,
                 'error_message': 'Username should only contain alphanumeric characters and underscore.'
