@@ -165,7 +165,7 @@ class UserListView(APIView):
             users = users.filter(username__icontains=search_query)
         
         queryset = paginator.paginate_queryset(users, request)
-        serializer = UserSerializer(queryset, many=True)
+        serializer = UserSerializer(queryset, many=True, context={'request_user': request.user})
         response = Response(serializer.data)
         response.headers = {
             'Pages': str(paginator.page.paginator.num_pages),
@@ -181,7 +181,7 @@ class UserDetailView(APIView):
             response = Response("User not found.", status=status.HTTP_404_NOT_FOUND)
             return response
         
-        serializer = UserSerializer(user)
+        serializer = UserSerializer(user, context={'request_user': request.user})
         response = Response(serializer.data)
         return response
 
@@ -191,7 +191,7 @@ class SelfUserDetailView(APIView):
     
     def get(self, request):
         user = request.user
-        serializer = UserSerializer(user)
+        serializer = UserSerializer(user, context={'request_user': request.user})
         response = Response(serializer.data)
         return response
 
@@ -236,8 +236,6 @@ class UserStatsView(APIView):
 
 def get_user(request):
     user = request.user
-    print('checkpt')
-    print(user)
     if user:
         request.session['usr'] = user
         return redirect(reverse('social:complete', args=("backend_name,")))
