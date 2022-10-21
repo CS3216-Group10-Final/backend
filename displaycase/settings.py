@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'games',
     'activities',
     'badges',
+    'follows',
     'pb_model',
     'django_cleanup.apps.CleanupConfig',
     'social_django',

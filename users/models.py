@@ -61,6 +61,9 @@ class User(AbstractUser):
 
     objects = UserManager()
 
+    def __str__(self):
+        return self.username
+
     def get_average_rating(self):
         average_rating = self.game_entries.aggregate(Avg('rating'))['rating__avg']
         if not average_rating:
