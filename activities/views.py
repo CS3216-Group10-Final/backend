@@ -27,15 +27,19 @@ class ActivityView(APIView):
         return response
 
 class TimelineView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, id):
+    def get(self, request):
         paginator = PageNumberPagination()
 
         # get all follows
         follows = Follow.objects.filter(follower=request.user).values_list('followee', flat=True)
+        follows = list(follows)
+        follows.append(request.user.id)
+
 
         #filter all activities by users in follows
-        entries = Activity.objects.filter(user__in=follows).order_by('-time_created')
+        entries = Activity.objects.filter(user__id__in=follows).order_by('-time_created')
 
         queryset = paginator.paginate_queryset(entries, request)
         serializer = ActivitySerializer(queryset, many=True)

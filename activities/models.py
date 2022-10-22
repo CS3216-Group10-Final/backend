@@ -23,7 +23,7 @@ class Activity(models.Model):
     def __str__(self) -> str:
         return self.user.__str__() + ' ' + self.game.__str__() + ' ' + self.activity_type.__str__()
 
-    def generateActivities(new_entry, original_status, original_rating, original_review, *args, **kwargs):
+    def generateActivities(new_entry, user, original_status, original_rating, original_review, *args, **kwargs):
 
         if original_status != new_entry.status:
             a = Activity(user=new_entry.user, game=new_entry.game, activity_type=Activity.ActivityType.NEW_STATUS.value,

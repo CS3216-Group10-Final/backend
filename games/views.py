@@ -48,6 +48,7 @@ class GameView(APIView):
         
         
 class GameEntriesView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     
     def get(self, request):
         search_query = request.query_params.get('query')
@@ -79,7 +80,7 @@ class GameEntriesView(APIView):
         serializer = GameEntrySerializer(data=data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        queryset = GameEntry.objects.filter(game__id=data['game_id'], user__id=data['user_id'])
+        queryset = GameEntry.objects.filter(game__id=data['game_id'], user=request.user)
         if len(queryset) > 0:
             return Response("GameEntry already exists.", status=status.HTTP_405_METHOD_NOT_ALLOWED)
         serializer.save()
@@ -87,6 +88,7 @@ class GameEntriesView(APIView):
 
 
 class GameEntryView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, id):
         try:
@@ -105,15 +107,23 @@ class GameEntryView(APIView):
             original_rating = game.rating
             original_review = game.review
 
+            if game.user != request.user:
+                return Response("Cannot edit other user game entries.", status=status.HTTP_401_UNAUTHORIZED)
+
+            if request.data['user_id'] != request.user.id:
+                return Response("Cannot edit user_id field.", status=status.HTTP_401_UNAUTHORIZED)
+
             serializer = GameEntrySerializer(game, data=request.data)
             if serializer.is_valid():
                 new_game = serializer.save()
-                Activity.generateActivities(new_game, original_status, original_rating, original_review)
+                Activity.generateActivities(new_game, request.user, original_status, original_rating, original_review)
                 response = Response(serializer.data)
             else:
                 response = Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except GameEntry.DoesNotExist:
             response = Response("Game entry not found.", status=status.HTTP_404_NOT_FOUND)
+        except:
+            response = Response(status=status.HTTP_400_BAD_REQUEST)
         return response
 
     def delete(self, request, id):
