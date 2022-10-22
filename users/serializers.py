@@ -37,7 +37,10 @@ class UserSerializer(serializers.ModelSerializer):
     
     def get_is_following(self, obj):
         request_user = self.context.get('request_user')
-        return obj.incoming_follows.filter(follower=request_user.id).exists()
+        if request_user:
+            return obj.incoming_follows.filter(follower=request_user.id).exists()
+        else:
+            return True
 
 class PrivateUserSerializer(UserSerializer):
     class Meta:
