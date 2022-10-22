@@ -129,7 +129,7 @@ class GoogleLoginCallbackView(APIView):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            email_username = email.split('@')[0]
+            email_username = email.split('@')[0].replace('.', '')
             username = User.objects.generate_unique_username_from(email_username)
             user = User.objects.create_user(username, email, User.objects.make_random_password())
             if User.objects.count() <= badges_constants.PIONEER_BADGE_QUOTA:
