@@ -48,7 +48,7 @@ class GameView(APIView):
         
         
 class GameEntriesView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     
     def get(self, request):
         search_query = request.query_params.get('query')
@@ -88,7 +88,7 @@ class GameEntriesView(APIView):
 
 
 class GameEntryView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get(self, request, id):
         try:
