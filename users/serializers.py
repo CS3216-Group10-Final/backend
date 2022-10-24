@@ -33,7 +33,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'profile_picture_link', 'badges', 'is_following']
+        fields = ['id', 'username', 'bio', 'profile_picture_link', 'badges', 'is_following']
     
     def get_is_following(self, obj):
         request_user = self.context.get('request_user')
@@ -45,7 +45,7 @@ class UserSerializer(serializers.ModelSerializer):
 class PrivateUserSerializer(UserSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'profile_picture_link', 'badges', 'is_following', 'steamid']
+        fields = ['id', 'username', 'bio', 'profile_picture_link', 'badges', 'is_following', 'steamid']
 
 class UserStatsSerializer(serializers.ModelSerializer):
     average_rating = serializers.FloatField(source='get_average_rating', read_only=True)
