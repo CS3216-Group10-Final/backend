@@ -1,6 +1,5 @@
 from django.db.models import Q
 from django.shortcuts import render
-from igdb.wrapper import IGDBWrapper
 from rest_framework import viewsets, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -10,7 +9,6 @@ from games.serializers import GameSerializer, GameEntrySerializer
 from .models import Game, GameEntry
 from activities.models import Activity
 
-from displaycase import igdbapi_pb2
 import requests
 import os
 
@@ -83,7 +81,8 @@ class GameEntriesView(APIView):
         queryset = GameEntry.objects.filter(game__id=data['game_id'], user=request.user)
         if len(queryset) > 0:
             return Response("GameEntry already exists.", status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        serializer.save()
+        new_game = serializer.save()
+        Activity.generateActivities(new_game, request.user, original_status=None, original_rating=None, original_review='')
         return Response(serializer.data)
 
 
