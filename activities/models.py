@@ -8,6 +8,7 @@ class Activity(models.Model):
         NEW_STATUS = 0
         NEW_RATING = 1
         NEW_REVIEW = 2
+        NEW_GAME = 3
         #steam activities:
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="activities")
@@ -25,7 +26,11 @@ class Activity(models.Model):
 
     def generateActivities(new_entry, user, original_status, original_rating, original_review, *args, **kwargs):
 
-        if original_status != new_entry.status:
+        if original_status is None:
+            a = Activity(user=new_entry.user, game=new_entry.game, activity_type=Activity.ActivityType.NEW_GAME.value,
+            new_status=new_entry.status, game_entry=new_entry)
+            a.save()
+        elif original_status != new_entry.status:
             a = Activity(user=new_entry.user, game=new_entry.game, activity_type=Activity.ActivityType.NEW_STATUS.value,
             new_status=new_entry.status, game_entry=new_entry)
             a.save()
