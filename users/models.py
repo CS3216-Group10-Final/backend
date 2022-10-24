@@ -55,7 +55,6 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     profile_picture_link = models.ImageField(upload_to=profile_pic_image_path, blank=True, null=True)
     steamid = models.CharField(max_length=20, blank=True)
-    bio = models.CharField(max_length=250, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
