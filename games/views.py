@@ -5,9 +5,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
-from games.serializers import GameSerializer, GameEntrySerializer
+from games.serializers import GameSerializer, GameEntrySerializer, ReviewSerializer
 from .models import Game, GameEntry
 from activities.models import Activity
+from follows.models import Follow
 
 import requests
 import os
@@ -133,4 +134,28 @@ class GameEntryView(APIView):
             game.delete()
         except GameEntry.DoesNotExist:
             response = Response("Game entry not found.", status=status.HTTP_404_NOT_FOUND)
+        return response
+
+class ReviewsView(APIView):
+    
+    def get(self, request):
+        queryset = GameEntry.objects.all()
+        
+        game_id = request.query_params.get('game_id')
+        following_only = request.query_params.get('following_only')
+        if game_id:
+            queryset = queryset.filter(game__id=game_id)
+        if following_only and following_only.lower() == "true" and request.user:
+            followees = Follow.get_followees_of(request.user)
+            queryset = queryset.filter(user__in=followees)
+
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
+        queryset = paginator.paginate_queryset(queryset, request)
+
+        serializer = ReviewSerializer(queryset, many=True)
+        response = Response(serializer.data)
+        response.headers = {
+            'Pages': str(paginator.page.paginator.num_pages),
+            'Access-Control-Expose-Headers': '*'}
         return response

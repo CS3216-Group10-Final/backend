@@ -9,3 +9,11 @@ class Follow(models.Model):
 
     def __str__(self):
         return f'{self.follower} follows {self.followee}'
+    
+    @classmethod
+    def get_followers_of(cls, user):
+        return User.objects.filter(outgoing_follows__followee=user)
+    
+    @classmethod
+    def get_followees_of(cls, user):
+        return User.objects.filter(incoming_follows__follower=user)
