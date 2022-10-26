@@ -29,4 +29,10 @@ class GameEntrySerializer(serializers.ModelSerializer):
         model = GameEntry
         exclude = ['game', 'user']
 
+class ReviewSerializer(serializers.ModelSerializer):
+    user_username = serializers.CharField(source='user.username', read_only=True)
+    game_id = serializers.PrimaryKeyRelatedField(source='game', queryset = Game.objects.all())
 
+    class Meta:
+        model = GameEntry
+        fields = ['user_username', 'game_id', 'rating', 'review']
