@@ -41,4 +41,4 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GameEntry
-        fields = ['user_username', 'user_picture', 'game_id', 'rating', 'review']
+        fields = ['user_username', 'user_picture', 'game_id', 'rating', 'review', 'status']
