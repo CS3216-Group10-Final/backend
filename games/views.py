@@ -143,11 +143,17 @@ class ReviewsView(APIView):
         
         game_id = request.query_params.get('game_id')
         following_only = request.query_params.get('following_only')
+        has_rating = request.query_params.get('has_rating')
+        has_review = request.query_params.get('has_review')
         if game_id:
             queryset = queryset.filter(game__id=game_id)
         if following_only and following_only.lower() == "true" and request.user.is_authenticated:
             followees = Follow.get_followees_of(request.user)
             queryset = queryset.filter(user__in=followees)
+        if has_rating and has_rating.lower() == "true":
+            queryset = queryset.exclude(rating__isnull=True)
+        if has_review and has_review.lower() == "true":
+            queryset = queryset.exclude(review__isnull=True).exclude(review__exact='')
 
         paginator = PageNumberPagination()
         paginator.page_size = 20

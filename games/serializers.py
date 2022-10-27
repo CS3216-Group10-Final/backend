@@ -31,8 +31,14 @@ class GameEntrySerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     user_username = serializers.CharField(source='user.username', read_only=True)
+    user_picture = serializers.ImageField(
+        source='user.profile_picture_link',
+        use_url=True, 
+        required=False, 
+        allow_empty_file=True,
+        allow_null=True)
     game_id = serializers.PrimaryKeyRelatedField(source='game', queryset = Game.objects.all())
 
     class Meta:
         model = GameEntry
-        fields = ['user_username', 'game_id', 'rating', 'review']
+        fields = ['user_username', 'user_picture', 'game_id', 'rating', 'review']
