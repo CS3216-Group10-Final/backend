@@ -145,7 +145,7 @@ class ReviewsView(APIView):
         following_only = request.query_params.get('following_only')
         if game_id:
             queryset = queryset.filter(game__id=game_id)
-        if following_only and following_only.lower() == "true" and request.user:
+        if following_only and following_only.lower() == "true" and request.user.is_authenticated:
             followees = Follow.get_followees_of(request.user)
             queryset = queryset.filter(user__in=followees)
 
