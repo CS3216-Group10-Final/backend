@@ -7,9 +7,11 @@ from rest_framework.pagination import PageNumberPagination
 
 from .models import Activity
 from .serializers import ActivitySerializer
+from games.serializers import GameSerializer
 
 from follows.models import Follow
 from users.models import User
+from games.models import Game
 
 class ActivityView(APIView):
 
@@ -62,4 +64,43 @@ class TimelineView(APIView):
             'Access-Control-Expose-Headers': '*'}
         return response
 
-        
+class RecentGamesView(APIView):
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        paginator = PageNumberPagination()
+        game_num = request.query_params.get('n')
+
+        # get all follows
+        follows = Follow.objects.filter(follower=request.user).values_list('followee', flat=True)
+        follows = list(follows)
+        follows.append(request.user.id)
+
+
+        #filter all activities by users in follows
+        entries = Activity.objects.filter(user__id__in=follows).order_by('-time_created')
+
+        games = entries.values_list('game', flat=True).distinct().order_by('-time_created')
+
+        gamelist = []
+
+        print(games)
+
+        if game_num:
+            ids = []
+            for game in games:
+                if game not in ids:
+                    gamelist.append(Game.objects.get(id=game))
+                    ids.append(game)
+                if len(gamelist) == int(game_num):
+                    break
+
+
+        queryset = paginator.paginate_queryset(gamelist, request)
+        serializer = GameSerializer(queryset, many=True)
+        response = Response(serializer.data)
+        response.headers = {
+            'Pages': str(paginator.page.paginator.num_pages),
+            'Access-Control-Expose-Headers': '*'}
+        return response
