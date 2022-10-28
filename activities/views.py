@@ -85,8 +85,6 @@ class RecentGamesView(APIView):
 
         gamelist = []
 
-        print(games)
-
         if game_num:
             ids = []
             for game in games:
