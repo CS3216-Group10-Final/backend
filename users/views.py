@@ -19,7 +19,7 @@ from urllib.parse import urlencode
 from badges import constants as badges_constants
 from badges.models import Badge, BadgeEntry
 from .models import User
-from .serializers import GoogleLoginSerializer, RegisterSerializer, UserSerializer, UserStatsSerializer
+from .serializers import GoogleLoginSerializer, RegisterSerializer, UserSerializer, UserStatsSerializer, PrivateUserSerializer
 from .utils import get_google_access_token, get_google_email, get_tokens_for_user
 
 class RegisterView(generics.GenericAPIView):
@@ -191,7 +191,7 @@ class SelfUserDetailView(APIView):
     
     def get(self, request):
         user = request.user
-        serializer = UserSerializer(user, context={'request_user': request.user})
+        serializer = PrivateUserSerializer(user, context={'request_user': request.user})
         response = Response(serializer.data)
         return response
 
@@ -234,8 +234,3 @@ class UserStatsView(APIView):
         response = Response(serializer.data)
         return response
 
-def get_user(request):
-    user = request.user
-    if user:
-        request.session['usr'] = user
-        return redirect(reverse('social:complete', args=("backend_name,")))
