@@ -75,7 +75,9 @@ class RecentGamesView(APIView):
         # get all follows
         follows = Follow.objects.filter(follower=request.user).values_list('followee', flat=True)
         follows = list(follows)
-        follows.append(request.user.id)
+
+        # Include requester in follows
+        #follows.append(request.user.id)
 
 
         #filter all activities by users in follows
