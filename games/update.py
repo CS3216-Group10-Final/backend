@@ -3,7 +3,6 @@ import time
 from django.shortcuts import render
 from django.db.models import Q
 from django.shortcuts import render
-from igdb.wrapper import IGDBWrapper
 from rest_framework import viewsets, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,7 +11,6 @@ from rest_framework.pagination import PageNumberPagination
 from games.serializers import GameSerializer, GenreSerializer, PlatformSerializer
 from .models import Game, Genre, Platform
 
-from displaycase import igdbapi_pb2
 import requests
 import os
 
@@ -29,8 +27,11 @@ def updateToken():
         return token
     except:
         raise Exception("Error obtaining access token."    )
-    
-def updateGames():
+
+def updateAllGames():
+    updateGames(0, 210000)
+
+def updateGames(start, end):
     token = os.getenv("TWITCH_AUTH")
     client_id = os.getenv("DISPLAYCASE_CLIENT_ID", "")
 
@@ -38,10 +39,10 @@ def updateGames():
         token = updateToken()
         
     url = "https://api.igdb.com/v4/games"
-    headers = {"Client-ID": client_id, "Authorization": "Bearer " + token}
-    offset = 0
-    while offset < 208000:
-        query = 'fields name, cover.url, genres.name, platforms.name, first_release_date, summary, franchise.name, involved_companies.*, alternative_names.name, rating_count; limit 500; offset '
+    headers = {"Client-ID": client_id, "Authorization": "Bearer " + token, "Content-Type": "application/json"}
+    offset = start
+    while offset < end:
+        query = 'fields name, cover.url, genres.name, platforms.name, first_release_date, summary, franchise.name, involved_companies.*, alternative_names.name, rating_count, websites.*; limit 500; offset '
         query += str(offset) + ';'
         r = requests.post(url, data=query, headers=headers)
         data = r.json()
@@ -61,6 +62,13 @@ def updateGames():
             if 'alternative_names' in game:
                 names = map(lambda a : a['name'], game['alternative_names'])
                 game['alternative_names'] = ', '.join(names)
+            if 'websites' in game:
+                for w in game['websites']:
+                    if w['category'] == 13:
+                        steamurl = w['url']
+                        post = steamurl.split('app/')[-1]
+                        steamappid = post.split('/')[0]
+                        game['steamappid'] = steamappid
             #if 'involved_companies' in game:
                 #for company in game['involved_companies']:
                     #if company['publisher']:
@@ -74,7 +82,7 @@ def updateGames():
                 print(serializer.errors)
             else:
                 serializer.save()
-        print(offset)
+        print(offset + 500)
         offset += 500
     
 

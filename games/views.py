@@ -1,3 +1,4 @@
+from re import A
 from django.db.models import Q
 from django.shortcuts import render
 from rest_framework import viewsets, permissions, status
@@ -165,3 +166,26 @@ class ReviewsView(APIView):
             'Pages': str(paginator.page.paginator.num_pages),
             'Access-Control-Expose-Headers': '*'}
         return response
+
+class ImportSteamGames(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        steamid = user.steamid
+        if not steamid:
+            return Response('Steam account not linked', status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        url = f'http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={os.getenv("STEAM_API_KEY")}&steamid={steamid}&format=json&include_appinfo=True&include_played_free_games=True'
+        r = requests.get(url)
+        data = r.json()
+
+        try:
+            count = data['game_count']
+            games = data['games']
+
+            #match by name and alternative_names? or by website(steamappid in igdb database) 
+            #consider parent_game and version_parent
+
+        except:
+            return Response('Unexpected error occured', status=status.HTTP_400_BAD_REQUEST)
