@@ -64,7 +64,7 @@ def updateGames(start, end):
                 game['alternative_names'] = ', '.join(names)
             if 'websites' in game:
                 for w in game['websites']:
-                    if w['category'] == 13:
+                    if 'category' in w and w['category'] == 13:
                         steamurl = w['url']
                         post = steamurl.split('app/')[-1]
                         steamappid = post.split('/')[0]
