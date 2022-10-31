@@ -26,6 +26,7 @@ class Game(models.Model):
     franchise = models.CharField(max_length=250, blank=True)
     rating_count = models.IntegerField(default=0)
     alternative_names = models.TextField(blank=True)
+    steamappid = models.CharField(max_length=64, blank=True)
 
     def __str__(self) -> str:
         return self.name
