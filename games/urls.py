@@ -8,4 +8,5 @@ urlpatterns = [
     re_path(r'game-entries/?$', views.GameEntriesView.as_view(), name='game-entries'),
     re_path(r'game-entries/(?P<id>\d+)/?$', views.GameEntryView.as_view(), name='game-entry'),
     re_path(r'reviews/?$', views.ReviewsView.as_view(), name='reviews'),
+     re_path(r'steam/import/?$', views.ImportSteamGames.as_view(), name='import-steam'),
 ]
