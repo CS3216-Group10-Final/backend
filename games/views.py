@@ -179,6 +179,7 @@ class ImportSteamGames(APIView):
         url = f'http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={os.getenv("STEAM_API_KEY")}&steamid={steamid}&format=json&include_appinfo=True&include_played_free_games=True'
         r = requests.get(url)
         data = r.json()
+        data = data['response']
 
         try:
             count = data['game_count']
@@ -186,6 +187,22 @@ class ImportSteamGames(APIView):
 
             #match by name and alternative_names? or by website(steamappid in igdb database) 
             #consider parent_game and version_parent
+            appids = []
+            for game in games:
+                appid = game['appid']
+                appids.append(appid)
+            
+            
+            displaycasegameentries = GameEntry.objects.filter(user=user).values_list('game', flat=True)
+            displaycasegameentries = list(displaycasegameentries)
+            displaycasegames = Game.objects.filter(id__in=displaycasegameentries)
+            steamgames = Game.objects.filter(steamappid__in=appids)
 
-        except:
-            return Response('Unexpected error occured', status=status.HTTP_400_BAD_REQUEST)
+            remaining = steamgames.difference(displaycasegames)
+
+            serializer = GameSerializer(remaining, many=True)
+            return Response(serializer.data)
+
+
+        except Exception as e:
+            return Response(e, status=status.HTTP_400_BAD_REQUEST)
