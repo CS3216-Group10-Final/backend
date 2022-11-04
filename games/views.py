@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
 from games.serializers import GameSerializer, GameEntrySerializer, ReviewSerializer
-from .models import Game, GameEntry
+from .models import Game, GameEntry, Platform
 from activities.models import Activity
 from follows.models import Follow
 
@@ -199,6 +199,46 @@ class ImportSteamGames(APIView):
             steamgames = Game.objects.filter(steamappid__in=appids)
 
             remaining = steamgames.difference(displaycasegames)
+
+            serializer = GameSerializer(remaining, many=True)
+            return Response(serializer.data)
+
+
+        except Exception as e:
+            return Response(e, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        steamid = request.user.steamid
+        if not steamid:
+            return Response('Steam account not linked', status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        url = f'http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={os.getenv("STEAM_API_KEY")}&steamid={steamid}&format=json&include_appinfo=True&include_played_free_games=True'
+        r = requests.get(url)
+        data = r.json()
+        data = data['response']
+
+        try:
+            count = data['game_count']
+            games = data['games']
+
+            #match by name and alternative_names? or by website(steamappid in igdb database) 
+            #consider parent_game and version_parent
+            appids = []
+            for g in games:
+                appid = g['appid']
+                appids.append(appid)
+            
+            
+            displaycasegameentries = GameEntry.objects.filter(user=request.user).values_list('game', flat=True)
+            displaycasegameentries = list(displaycasegameentries)
+            displaycasegames = Game.objects.filter(id__in=displaycasegameentries)
+            steamgames = Game.objects.filter(steamappid__in=appids)
+
+            remaining = steamgames.difference(displaycasegames)
+            pc = Platform.objects.get(name__icontains='PC (MICROSOFT WINDOWS)')
+            for g in remaining:
+                entry = GameEntry(user=request.user, game=g, status=2)
+                entry.save()
 
             serializer = GameSerializer(remaining, many=True)
             return Response(serializer.data)
