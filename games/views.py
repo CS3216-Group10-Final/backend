@@ -200,14 +200,28 @@ class ImportSteamGames(APIView):
 
             remaining = steamgames.difference(displaycasegames)
 
-            serializer = GameSerializer(remaining, many=True)
-            return Response(serializer.data)
+            paginator = PageNumberPagination()
+            queryset = paginator.paginate_queryset(remaining, request)
+
+            serializer = GameSerializer(queryset, many=True)
+            response = Response(serializer.data)
+            response.headers = {
+                'Pages': str(paginator.page.paginator.num_pages),
+                'Access-Control-Expose-Headers': '*'}
+            return response
 
 
         except Exception as e:
             return Response(e, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
+        game_status = request.query_params.get('status')
+        if game_status is not None and game_status.isdigit():
+            game_status = int(game_status)
+            if game_status not in GameEntry.GameEntryStatus.values:
+                game_status = GameEntry.GameEntryStatus.COMPLETED.value
+        else:
+            game_status = GameEntry.GameEntryStatus.COMPLETED.value 
         steamid = request.user.steamid
         if not steamid:
             return Response('Steam account not linked', status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -236,12 +250,22 @@ class ImportSteamGames(APIView):
 
             remaining = steamgames.difference(displaycasegames)
             pc = Platform.objects.get(name__icontains='PC (MICROSOFT WINDOWS)')
-            for g in remaining:
-                entry = GameEntry(user=request.user, game=g, status=2)
-                entry.save()
 
-            serializer = GameSerializer(remaining, many=True)
-            return Response(serializer.data)
+            entries = []
+            for g in remaining:
+                entry = GameEntry(user=request.user, game=g, status=game_status)
+                entry.save()
+                entries.append(entry)
+
+            paginator = PageNumberPagination()
+            queryset = paginator.paginate_queryset(entries, request)
+
+            serializer = GameEntrySerializer(queryset, many=True)
+            response = Response(serializer.data)
+            response.headers = {
+                'Pages': str(paginator.page.paginator.num_pages),
+                'Access-Control-Expose-Headers': '*'}
+            return response
 
 
         except Exception as e:
