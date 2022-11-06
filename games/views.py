@@ -178,8 +178,11 @@ class ImportSteamGames(APIView):
 
         url = f'http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={os.getenv("STEAM_API_KEY")}&steamid={steamid}&format=json&include_appinfo=True&include_played_free_games=True'
         r = requests.get(url)
-        data = r.json()
-        data = data['response']
+        try:
+            data = r.json()
+            data = data['response']
+        except:
+            return Response(r.content, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             count = data['game_count']
