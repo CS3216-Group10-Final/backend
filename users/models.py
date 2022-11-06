@@ -71,6 +71,9 @@ class User(AbstractUser):
         if not average_rating:
             return 0
         return average_rating
+    
+    def get_total_games_played(self):
+        return self.game_entries.count()
 
     def get_game_status_distribution(self):
         GameEntry = apps.get_model('games', 'GameEntry')

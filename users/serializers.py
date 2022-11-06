@@ -49,6 +49,7 @@ class PrivateUserSerializer(UserSerializer):
 
 class UserStatsSerializer(serializers.ModelSerializer):
     average_rating = serializers.FloatField(source='get_average_rating', read_only=True)
+    total_games_played = serializers.IntegerField(source='get_total_games_played', read_only=True)
     game_status_distribution = serializers.DictField(
         source='get_game_status_distribution', 
         child=serializers.IntegerField(), 
@@ -69,11 +70,12 @@ class UserStatsSerializer(serializers.ModelSerializer):
         source='get_play_year_distribution', 
         child=serializers.IntegerField(), 
         read_only=True)
-
+    
     class Meta:
         model = User
         fields = [
             'average_rating',
+            'total_games_played',
             'game_status_distribution',
             'game_genre_distribution',
             'platform_distribution',
