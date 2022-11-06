@@ -185,6 +185,9 @@ class ImportSteamGames(APIView):
             return Response(r.content, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            if 'games' not in data or 'game_count' not in data:
+                return Response("No games found. Make sure your Steam 'Game details' privacy setting is set to public.", status=status.HTTP_404_NOT_FOUND)
+
             count = data['game_count']
             games = data['games']
 
