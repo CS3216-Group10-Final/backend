@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
 from games.serializers import GameSerializer, GameEntrySerializer, ReviewSerializer
-from .models import Game, GameEntry, Platform
+from .models import Game, GameEntry, Platform, Genre
 from activities.models import Activity
 from follows.models import Follow
 
@@ -19,6 +19,11 @@ class GamesView(APIView):
     
     def get(self, request):
         search_query = request.query_params.get('query')
+        release_years = request.GET.getlist('release_year')
+        genres = request.GET.getlist('genre')
+        platforms = request.GET.getlist('platform')
+
+
         paginator = PageNumberPagination()
         paginator.page_size = 20
 
@@ -26,6 +31,31 @@ class GamesView(APIView):
 
         if search_query:
             games = games.filter(Q(name__icontains=search_query) | Q(alternative_names__icontains=search_query))
+
+        if release_years:
+            year_list = []
+            for year in release_years:
+                if year.isdigit():
+                    year_list.append(year)
+            if year_list:
+                games = games.filter(first_release_date__year__in=year_list)
+        if genres:
+            genre_list = []
+            for genre in genres:
+                genre = Genre.objects.filter(name__icontains=genre).first()
+                if genre:
+                    genre_list.append(genre)
+            if genre_list:
+                games = games.filter(genres__in=genre_list)
+
+        if platforms:
+            platform_list = []
+            for platform in platforms:
+                platform = Platform.objects.filter(name__icontains=platform).first()
+                if platform:
+                    platform_list.append(platform)
+            if platform_list:
+                games = games.filter(platforms__in=platform_list)
         
         queryset = paginator.paginate_queryset(games, request)
         serializer = GameSerializer(queryset, many=True)
