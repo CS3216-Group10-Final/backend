@@ -39,6 +39,7 @@ class GamesView(APIView):
                     year_list.append(year)
             if year_list:
                 games = games.filter(first_release_date__year__in=year_list)
+
         if genres:
             genre_list = []
             for genre in genres:
@@ -84,6 +85,9 @@ class GameEntriesView(APIView):
         search_query = request.query_params.get('query')
         user_id = request.query_params.get('user_id')
         game_id = request.query_params.get('game_id')
+        release_years = request.GET.getlist('release_year')
+        genres = request.GET.getlist('genre')
+        platforms = request.GET.getlist('platform')
         paginator = PageNumberPagination()
 
         entries = GameEntry.objects.all().order_by('id')
@@ -96,6 +100,32 @@ class GameEntriesView(APIView):
 
         if game_id:
             entries = entries.filter(game__id=game_id)
+
+        if release_years:
+            year_list = []
+            for year in release_years:
+                if year.isdigit():
+                    year_list.append(year)
+            if year_list:
+                entries = entries.filter(game__first_release_date__year__in=year_list)
+
+        if genres:
+            genre_list = []
+            for genre in genres:
+                genre = Genre.objects.filter(name__icontains=genre).first()
+                if genre:
+                    genre_list.append(genre)
+            if genre_list:
+                entries = entries.filter(game__genres__in=genre_list)
+
+        if platforms:
+            platform_list = []
+            for platform in platforms:
+                platform = Platform.objects.filter(name__icontains=platform).first()
+                if platform:
+                    platform_list.append(platform)
+            if platform_list:
+                entries = entries.filter(platforms__in=platform_list)
 
         queryset = paginator.paginate_queryset(entries, request)
         serializer = GameEntrySerializer(queryset, many=True)
