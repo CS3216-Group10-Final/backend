@@ -1,4 +1,5 @@
 from re import A
+from datetime import datetime, timedelta
 from django.db.models import Q
 from django.shortcuts import render
 from rest_framework import viewsets, permissions, status
@@ -76,7 +77,22 @@ class GameView(APIView):
         except Game.DoesNotExist:
             response = Response("Game not found.", status=status.HTTP_404_NOT_FOUND)
         return response
+
+class PopularNowGamesView(APIView):
+
+    def get(self, request):
+        DAY_RANGE = 182 
+        date_now = datetime.today()
+        date_start = date_now + timedelta(days=-DAY_RANGE)
+
+        games = Game.objects.filter(first_release_date__gte=date_start).order_by('-rating_count', '-first_release_date')[:20]
+
+        serializer = GameSerializer(games, many=True)
+        return Response(serializer.data)
         
+
+
+
         
 class GameEntriesView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
