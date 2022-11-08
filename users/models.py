@@ -116,12 +116,13 @@ class User(AbstractUser):
         game_entries = self.game_entries
         distribution = {}
         for entry in game_entries.all():
-            year = entry.game.first_release_date.year
-            if year in distribution:
-                distribution[year] += 1
-            else:
-                distribution[year] = 1
-
+            date = entry.game.first_release_date
+            if date:
+                year = date.year
+                if year in distribution:
+                    distribution[year] += 1
+                else:
+                    distribution[year] = 1
         return distribution
 
     def get_play_year_distribution(self):
