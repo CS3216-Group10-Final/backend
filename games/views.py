@@ -48,7 +48,7 @@ class GamesView(APIView):
                 if genre:
                     genre_list.append(genre)
             if genre_list:
-                games = games.filter(genres__in=genre_list)
+                games = games.filter(genres__in=genre_list).distinct()
 
         if platforms:
             platform_list = []
@@ -57,7 +57,7 @@ class GamesView(APIView):
                 if platform:
                     platform_list.append(platform)
             if platform_list:
-                games = games.filter(platforms__in=platform_list)
+                games = games.filter(platforms__in=platform_list).distinct()
         
         queryset = paginator.paginate_queryset(games, request)
         serializer = GameSerializer(queryset, many=True)
@@ -132,7 +132,7 @@ class GameEntriesView(APIView):
                 if genre:
                     genre_list.append(genre)
             if genre_list:
-                entries = entries.filter(game__genres__in=genre_list)
+                entries = entries.filter(game__genres__in=genre_list).distinct()
 
         if platforms:
             platform_list = []
@@ -141,7 +141,7 @@ class GameEntriesView(APIView):
                 if platform:
                     platform_list.append(platform)
             if platform_list:
-                entries = entries.filter(platforms__in=platform_list)
+                entries = entries.filter(platforms__in=platform_list).distinct()
 
         queryset = paginator.paginate_queryset(entries, request)
         serializer = GameEntrySerializer(queryset, many=True)
