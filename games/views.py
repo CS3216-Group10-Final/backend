@@ -143,12 +143,13 @@ class GameEntriesView(APIView):
             if platform_list:
                 entries = entries.filter(platforms__in=platform_list).distinct()
 
-        queryset = paginator.paginate_queryset(entries, request)
-        serializer = GameEntrySerializer(queryset, many=True)
+        # queryset = paginator.paginate_queryset(entries, request)
+        # serializer = GameEntrySerializer(queryset, many=True)
+        serializer = GameEntrySerializer(entries, many=True)
         response = Response(serializer.data)
-        response.headers = {
-            'Pages': str(paginator.page.paginator.num_pages),
-            'Access-Control-Expose-Headers': '*'}
+        # response.headers = {
+        #     'Pages': str(paginator.page.paginator.num_pages),
+        #     'Access-Control-Expose-Headers': '*'}
         return response
         
     def post(self, request):
