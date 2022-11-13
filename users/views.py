@@ -9,6 +9,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import UpdateAPIView
 from rest_framework_simplejwt import views as jwt_views
 from rest_framework_simplejwt import serializers as jwt_serializers
 from rest_framework_simplejwt.exceptions import InvalidToken
@@ -19,7 +20,7 @@ from urllib.parse import urlencode
 from badges import constants as badges_constants
 from badges.models import Badge, BadgeEntry
 from .models import User
-from .serializers import GoogleLoginSerializer, RegisterSerializer, UserSerializer, UserStatsSerializer, PrivateUserSerializer
+from .serializers import GoogleLoginSerializer, RegisterSerializer, UserSerializer, UserStatsSerializer, PrivateUserSerializer, ChangePasswordSerializer
 from .utils import get_google_access_token, get_google_email, get_tokens_for_user
 
 class RegisterView(generics.GenericAPIView):
@@ -59,6 +60,32 @@ class RegisterView(generics.GenericAPIView):
             BadgeEntry.objects.create(user=user, badge=badge)
 
         return Response()
+
+class ChangePasswordView(UpdateAPIView):
+        serializer_class = ChangePasswordSerializer
+        model = User
+        permission_classes = (permissions.IsAuthenticated,)
+
+        def get_object(self, queryset=None):
+            obj = self.request.user
+            return obj
+
+        def update(self, request, *args, **kwargs):
+            self.object = self.get_object()
+            serializer = self.get_serializer(data=request.data)
+
+            if serializer.is_valid():
+                if not self.object.check_password(serializer.data.get("old_password")):
+                    response = Response({
+                        'error_code': 1,
+                        'error_message': 'Email and/or password is incorrect.'
+                    })
+                    return response
+                
+                self.object.set_password(serializer.data.get('new_password'))
+                self.object.save()
+                return Response()
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(jwt_views.TokenObtainPairView):
     """Takes a set of user credentials. 
