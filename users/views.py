@@ -61,29 +61,23 @@ class RegisterView(generics.GenericAPIView):
 
         return Response()
 
-class ChangePasswordView(UpdateAPIView):
-        serializer_class = ChangePasswordSerializer
-        model = User
+class ChangePasswordView(APIView):
         permission_classes = (permissions.IsAuthenticated,)
 
-        def get_object(self, queryset=None):
-            obj = self.request.user
-            return obj
-
-        def update(self, request, *args, **kwargs):
-            self.object = self.get_object()
-            serializer = self.get_serializer(data=request.data)
+        def post(self, request, *args, **kwargs):
+            serializer = ChangePasswordSerializer(data=request.data)
+            user = request.user
 
             if serializer.is_valid():
-                if not self.object.check_password(serializer.data.get("old_password")):
+                if not user.check_password(serializer.data.get("old_password")):
                     response = Response({
                         'error_code': 1,
                         'error_message': 'Email and/or password is incorrect.'
                     })
                     return response
                 
-                self.object.set_password(serializer.data.get('new_password'))
-                self.object.save()
+                user.set_password(serializer.data.get('new_password'))
+                user.save()
                 return Response()
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
